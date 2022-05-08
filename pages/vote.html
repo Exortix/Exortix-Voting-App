@@ -1,0 +1,74 @@
+<style>
+    .row-chart .col {
+        border-style: solid;
+    }
+    #PieChart {
+            height: 300;
+    }
+    @media (max-width: 768px) {
+        #main form#vote .form-check-inline {
+            display: block;
+            min-height: 1.5rem;
+            padding-left: 1.5em;
+            margin-bottom: .125rem;
+        }
+        #PieChart {
+            max-height: 200;
+        }
+    }
+</style>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+{{#post}}
+<script type="text/javascript">
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+google.charts.load('current', {'packages':['corechart']});
+google.charts.setOnLoadCallback(drawChart);
+
+function drawChart() {
+    var data = google.visualization.arrayToDataTable([
+        ["Choices", "Count"]{{#choices}},[capitalizeFirstLetter("{{value}}"), {{count}}]{{/choices}}
+    ]);
+    var options = {
+        title: "{{title}}"
+    }
+    var chart = new google.visualization.PieChart(document.getElementById('PieChart'));
+    chart.draw(data, options);
+    $(window).on('resize', function() {
+        chart.draw(data, options);
+    });
+}
+</script>
+<div class="row">
+    <div class="col">
+        <div class="alert alert-info" role="alert">
+            <h1 style="text-transform: capitalize;" align="center">{{title}}</h1>
+            <h4 style="margin:0; position: absolute; right: 0; bottom: 0; text-transform: capitalize;"><a href="/user/{{author}}">{{author}}</a></h4>
+        </div>
+        <form method="post" name="{{post_id}}"id="vote" >
+            <h3>{{topic}}</h3>
+            {{#choices}}
+            <div style="text-transform: capitalize;" class="form-check form-check-inline noselect" name={{value}}>
+                <input class="form-check-input" type="radio" name="{{value}}" id={{value}} required>
+                <label class="form-check-label" for="{{value}}" name={{value}}>
+                {{value}} [{{count}}]
+                </label>
+            </div>
+            {{/choices}}
+            <button type="submit">Submit Vote</button>
+        </form>  
+    </div>
+</div>
+<div class="row row-chart"><div class="col"><div id="PieChart"></div></div></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+    $(".form-check-input").ready(() => $('.form-check-input').prop('checked', false));
+    $(".form-check-input").change(function () {
+        $('.form-check-input').not(this).prop('checked', false);
+        $('.form-check-input').prop('required', true);
+        $('.form-check-input').not(this).prop('required', false);
+    });
+</script>
+{{/post}}

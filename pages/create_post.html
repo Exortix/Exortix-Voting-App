@@ -1,0 +1,118 @@
+{{^logged_in}}
+<div class="alert alert-warning" role="alert">
+    <h1 align='center'><a href='/login'>Please login to access this content</h1>
+</div>
+<br>
+{{/logged_in}}
+{{#logged_in}}
+<div id="duplicateAlert" style="display: none;" class="alert alert-danger" role="alert">
+    Duplicates are not allowed!
+</div>
+<form action="/new" method="post">
+    <div class="mb-3">
+        <label for="title" class="form-label">Title</label>
+        <input type="text" class="form-control" id="title" name="title" placeholder="" required>
+    </div>
+    <div class="mb-3">
+        <label for="topic" class="form-label">Topic</label>
+        <textarea class="form-control" id="topic" name="topic" rows="3" required></textarea>
+    </div>
+    <div class="mb-3" id="choices">
+        <label for="choices" class="form-label">Choices</label>
+        <div id="inputFormRow">
+            <div class="input-group mb-3">
+                <input type="text" name="choice0" class="form-control m-input" placeholder="Enter choice" autocomplete="off" required>
+            </div>
+        </div>
+        <div id="inputFormRow">
+            <div class="input-group mb-3">
+                <input type="text" name="choice1" class="form-control m-input" placeholder="Enter choice" autocomplete="off" required>
+            </div>
+        </div>
+
+        <div id="newRow"></div>
+        <button id="addRow" type="button" class="btn btn-info">Add Choice</button>
+    </div>
+    <div class="mb-3">
+        <label for="author" class="form-label">Author</label>
+        <input type="text" class="form-control" id="author" name="author" placeholder="" value="{{username}}" disabled readonly>
+    </div>
+    <button id="submit" type="submit">Create</button>
+</form>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+    function checkIfDuplicateExists(w){
+        return new Set(w).size !== w.length 
+    }
+
+    function checkChoices() {
+        let choicesArray = []
+        document.querySelectorAll("input[placeholder='Enter choice']").forEach( (element) => {
+            choicesArray.push(element.value);
+        });
+        if(checkIfDuplicateExists(choicesArray)) {
+            $("form").prop("disabled", true);
+            $("#submit").prop("disabled", true);
+            $("#duplicateAlert").css("display", "block");
+        } else {
+            $("form").prop("disabled", false);
+            $("#submit").prop("disabled", false);
+            $("#duplicateAlert").css("display", "none");
+        }
+    }
+
+    $(document).on("keydown", ":input:not(textarea):not(:submit):not(:button)", function(event) {
+        if (event.key == "Enter") {
+            event.preventDefault();
+        }
+    });
+    
+    // choices change value change to lowercase and prevent duplicates
+    $("#choices input[placeholder='Enter choice']").keyup(function () {
+        this.value=this.value.toLowerCase()
+        checkChoices()
+    });
+
+    $("#choices").ready(function () {
+        this.querySelectorAll("input[placeholder='Enter choice']").forEach( (element, index) => {
+            element.setAttribute("name", `choice${index}`)
+        });
+    });
+    
+    // add row
+    $("#addRow").click(function () {
+
+        var html = '';
+        html += '<div id="inputFormRow">';
+        html += '<div class="input-group mb-3">';
+        html += '<input type="text" name="choice" class="form-control m-input" placeholder="Enter choice" autocomplete="off" required>';
+        html += '<div class="input-group-append">';
+        html += '<button id="removeRow" type="button" class="btn btn-danger">Remove</button>';
+        html += '</div>';
+        html += '</div>';
+
+        $('#newRow').append(html);
+        document.getElementById('choices').querySelectorAll("input[placeholder='Enter choice']").forEach( (element, index) => {
+            element.setAttribute("name", `choice${index}`)
+        });
+        $("#choices input[placeholder='Enter choice']").keyup(function () {
+            this.value=this.value.toLowerCase()
+            checkChoices()
+        });
+    });
+
+    // remove row
+    $(document).on('click', '#removeRow', function () {
+        $(this).closest('#inputFormRow').remove();
+        document.getElementById('choices').querySelectorAll("input[placeholder='Enter choice']").forEach( (element, index) => {
+            element.setAttribute("name", `choice${index}`)
+        });
+        $("#choices input[placeholder='Enter choice']").keyup(function () {
+            this.value=this.value.toLowerCase()
+            checkChoices()
+        });
+        checkChoices()
+    });
+</script>
+{{/logged_in}}
+

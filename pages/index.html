@@ -1,0 +1,30 @@
+<style>
+    .post {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        text-align: center;
+        padding-right: 0.5em;
+        padding-left: 0.5em;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        background-color: rgba(0, 0, 255, 0.1);
+        /* box-shadow: 10px 5px 5px rgba(0, 0, 255, 0.1); */
+        transition-duration: 1ms;
+    }
+</style>
+{{#logged_in}}
+<div class="row">
+    <div class="alert alert-info" role="alert">
+        <h1 style="text-transform: capitalize;" align="center">Welcome {{username}}</h1>
+    </div>
+</div>
+<br>
+{{/logged_in}}
+<div class="row">
+    {{#posts}}
+    <div class="col-md-4 post">
+        <h3>{{title}}</h3>
+        <p>{{topic}}</p>
+        <a href="/vote/{{post_id}}">Visit Poll</a>
+    </div>
+    {{/posts}}
+</div>
